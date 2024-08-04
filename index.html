@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="src/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="icon"
+      href="https://cdn.icon-icons.com/icons2/37/PNG/512/TV_4089.png"
+    />
+    <title>CDB</title>
+  </head>
+  <body>
+    <div id="hi"></div>
+    <div id="searchBar" class="searchBar">
+      <div id="search">
+        <h2 id="info">search a show to see its' crossovers</h2>
+        <button id="legend">
+          <i class="fa fa-book"></i>
+        </button>
+        <button id="random">
+          <i class="fa fa-random"></i>
+        </button>
+        <input
+          type="text"
+          id="showName1"
+          list="showsList"
+          placeholder="Type a show's name"
+          autocomplete="off"
+        />
+        <datalist id="showsList"> </datalist>
+
+        <input
+          type="text"
+          id="showName2"
+          list="showsList"
+          placeholder="Type another show's name"
+          style="display: none;"
+          autocomplete="off"
+        />
+        <datalist id="showsList"> </datalist>
+        <button id="prevSearch">
+          <i class="fa fa-angle-double-left"></i>
+        </button>
+        <button id="searchShow">
+          <i class="fa fa-search"></i>
+        </button>
+        <button id="nextSearch">
+          <i class="fa fa-angle-double-right"></i>
+        </button>
+      </div>
+    </div>
+    <h3 id="fastDits"></h3>
+    <div id="crossovers" class="crossovers"></div>
+    <div id="myModal2" class="modal">
+      <div id="guide" class="guide">
+        <span id="close2" class="close">&times;</span>
+        <h1 id="guidelines">
+          <ul>
+            <li class="type1">spin off</li>
+            <li class="type2">crossover event</li>
+            <li class="type3">character apperence</li>
+            <li class="type4">same brand/cameo</li>
+            <li class="type5">show within a show</li>
+            <li class="type6">alternative cameo</li>
+            <li class="type7">* infinite earths canon</li>
+          </ul>
+        </h1>
+      </div>
+    </div>
+
+    <div id="myModal" class="modal">
+      <div id="show" class="show">
+        <span id="close" class="close">&times;</span>
+      </div>
+    </div>
+    <script src="src/app.js"></script>
+  </body>
+</html>
