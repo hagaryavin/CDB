@@ -38,6 +38,9 @@ body {
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
 }
+.type0 {
+  color: black;
+}
 .type1 {
   color: yellow;
 }
