@@ -413,7 +413,7 @@ function typeName2Num(typeName) {
   if (typeName === "show within a show") {
     return 5;
   }
-  return 4;
+  return 7;
 }
 function type2color(typeNum) {
   if (typeNum === 1) {
