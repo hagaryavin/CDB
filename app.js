@@ -1,7 +1,7 @@
 var showList = document.getElementById("showsList");
 const url =
   "https://script.google.com/macros/s/AKfycbyiztfyHGcqr8dPB4G-_ruG8IUb2L0d6NJOSuPV5pHEx9oR_KDMwJAHeBsultPxsl48lA/exec"; //deployment url
-getData();
+getData(); 
 var shows4real = [];
 var co4real = [];
 var franchises = [];
