@@ -2,14 +2,14 @@ var showList = document.getElementById("showsList");
 const url =
   "https://script.google.com/macros/s/AKfycbyiztfyHGcqr8dPB4G-_ruG8IUb2L0d6NJOSuPV5pHEx9oR_KDMwJAHeBsultPxsl48lA/exec"; //deployment url
 getData();  
-var shows4real = [];
-var co4real = [];
-var franchises = [];
+var shows4real = [];//רשימת הסדרות עם הנתונים 
+var co4real = [];//רשימת הקרוסאוברים
+var franchises = [];//פרנצ'ייזים
 var newShow = {};
 var newCO = {};
 var newFran = {};
-var onlyTheName = [];
-function getData() {
+var onlyTheName = [];//כל הסדרות אבל רק השמות
+function getData() {//נתונים מגוגל שיטס
   fetch(url)
     .then((res) => {
       return res.json();
@@ -17,7 +17,7 @@ function getData() {
     .then((json) => {
       json.data.shows.forEach((ele) => {
         newShow = {
-          title: ele.showname,
+          title: String(ele.showname),
           star: ele.infiniteearthscanon,
           id: ele.showid,
           network: ele.network,
@@ -25,10 +25,9 @@ function getData() {
           year: ele.year,
           franchise: ele.franchiseid,
           tmdbID: ele.tmdbid,
-          imgSrc: ""
+          imgSrc: "https://i.pinimg.com/736x/a7/74/c4/a774c42e46b508961c708248aa37419a.jpg"
         };
-        console.log(newShow.tmdbID);
-        if (newShow.tmdbID !== "") {
+        if (newShow.tmdbID !== "") {//מידע מTMDB
             if (newShow.id.charAt(0) === "S"){
                 newShow = detailsFromTMDBtv(newShow);
             }
@@ -37,13 +36,12 @@ function getData() {
             }
         }
         shows4real.push(newShow);
-        if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {
+        if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {//מכניס שמות סדרות
           onlyTheName.push(newShow.title);
           onlyTheName.sort();
         }
         var showNameAsOption = document.createElement("option");
-        //console.log(onlyTheName[onlyTheName.length - 1]);
-        if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {
+        if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {//מכניס לרשימת האפשרויות
           showNameAsOption.value = newShow.title;
         }
         showList.append(showNameAsOption);
@@ -53,7 +51,7 @@ function getData() {
           show1ID: ele.show1id,
           show2ID: ele.show2id,
           cross: ele.crossoverdescription,
-          type: typeName2Num(ele.crossovertype)
+          type: typeName2Num(ele.crossovertype)//סוג קרוסאובר
         };
         co4real.push(newCO);
       });
@@ -64,16 +62,16 @@ function getData() {
     });
 }
 
-function search1show(showName) {
+function search1show(showName) {//חיפוש תוכנית לפי שם
   var show = document.getElementById("show");
   removeAllChildNodes(show);
   if (legitShowName(showName) && showName.length > 0) {
-    viewCrossovers(createShowsCOList(showName));
+    document.getElementById("showName1").value=showName;//שם התוכנית בחיפוש
+    viewShow(findShowfromName(showName));// קודם פותח את הפופאפ
+    viewCrossovers(createShowsCOList(showName));//ומאחורה יש את הקרוסאוברים
   }
-  //console.log(franchises);
-  //print4realz();
 }
-function search2shows() {
+function search2shows() {//חיפוש קרוס לפי שמות 2 סדרות
   var show = document.getElementById("show");
   removeAllChildNodes(show);
   var showName1 = document.getElementById("showName1").value;
@@ -84,8 +82,8 @@ function search2shows() {
     legitShowName(showName2) &&
     showName2.length > 0
   ) {
-    if (showName1 === showName2) {
-      viewCrossovers(createShowsCOList(showName1));
+    if (showName1 === showName2) {//אותה סדרה פעמיים
+      search1show(showName1);
     } else {
       viewCrossovers(create2showsCOList(showName1, showName2));
     }
@@ -97,7 +95,7 @@ document.getElementById("searchShow").onclick = function () {
 function getShowIDfromName(showName) {
   return findShowfromName(showName).id;
 }
-function legitShowName(showName) {
+function legitShowName(showName) {//בודק ששם באמת בטבלה
   var i;
   for (i = 0; i < onlyTheName.length; i++) {
     if (onlyTheName[i] === showName) {
@@ -106,7 +104,7 @@ function legitShowName(showName) {
   }
   return false;
 }
-function createShowsCOList(showName) {
+function createShowsCOList(showName) {//מקבל שם סדרה ומחזיר רשימת קרוסאוברים עם הסדרה
   var showID = getShowIDfromName(showName);
   var COList = [];
   co4real.map((co) => {
@@ -117,7 +115,7 @@ function createShowsCOList(showName) {
   });
   return COList;
 }
-function create2showsCOList(showName1, showName2) {
+function create2showsCOList(showName1, showName2) {//מקבל 2 סדרות ומחזיר רשימת קרוסאוברים או ריק
   var show1ID = getShowIDfromName(showName1);
   var show2ID = getShowIDfromName(showName2);
   var COList = [];
@@ -150,14 +148,14 @@ function pickAnArrow(COType) {
   }
   return "⟶";
 }
-document.getElementById("legend").onclick = function () {
+document.getElementById("legend").onclick = function () {//פתיחת המקרא
   document.getElementById("myModal2").style.display = "block";
 };
 function viewCrossovers(crossoverList) {
   var crossovers = document.getElementById("crossovers");
   removeAllChildNodes(crossovers);
   if (isCOListfull(crossoverList)) {
-    crossoverList.map((co) => {
+    crossoverList.map((co) => {//עובר על הרשימה של הקרוסאוברים ומציג אותם בצבעים 
       var crossover = document.createElement("div");
       crossover.style.borderColor = type2color(co.type);
       crossover.classList.add("crossover");
@@ -165,8 +163,7 @@ function viewCrossovers(crossoverList) {
       var show1 = document.createElement("h2");
       show1.innerHTML = findShowfromID(co.show1ID).title;
       show1.onclick = function () {
-        search1show(co.show1);
-        viewShow(findShowfromID(co.show1ID));
+        search1show(findShowfromID(co.show1ID).title);//לחיצה על שם סדרה1 מחפש אותה
       };
       crossover.append(show1);
       var arrow = document.createElement("h1");
@@ -176,8 +173,7 @@ function viewCrossovers(crossoverList) {
       var show2 = document.createElement("h2");
       show2.innerHTML = findShowfromID(co.show2ID).title;
       show2.onclick = function () {
-        search1show(co.show2);
-        viewShow(findShowfromID(co.show2ID));
+        search1show(findShowfromID(co.show2ID).title);//לחיצה על שם סדרה2 מחפש אותה
       };
       crossover.append(show2);
       var details = document.createElement("p");
@@ -212,15 +208,15 @@ function findShowfromID(id) {
 var prevSearch = document.getElementById("prevSearch");
 var nextSearch = document.getElementById("nextSearch");
 var search1 = true;
-prevSearch.onclick = function () {
+prevSearch.onclick = function () {//מעבר בין סוגי חיפושים
   search1 = search1 ? false : true;
   changeSearch();
 };
-nextSearch.onclick = function () {
+nextSearch.onclick = function () {//מעבר בין סוגי חיפושים
   search1 = search1 ? false : true;
   changeSearch();
 };
-function changeSearch() {
+function changeSearch() {//שינוי חיפוש
   var otherSearchInput = document.getElementById("showName2");
   if (search1) {
     document.getElementById("info").innerHTML =
@@ -239,15 +235,14 @@ function changeSearch() {
   }
 }
 function randomShowName() {
-  var randNum = Math.floor(Math.random() * onlyTheName.length);
+  var randNum = Math.floor(Math.random() * onlyTheName.length);//אקראי לפי כמות השמות
   return onlyTheName[randNum];
 }
 document.getElementById("random").onclick = function () {
   var randShow = randomShowName();
   search1show(randShow);
-  viewShow(findShowfromName(randShow));
 };
-function detailsFromTMDBtv(showDetails) {
+function detailsFromTMDBtv(showDetails) {//מידע מהרשת על הסדרה
   var updatedShowDetails = showDetails;
   var tmdbID = showDetails.tmdbID;
   var tmdbURL =
@@ -259,17 +254,23 @@ function detailsFromTMDBtv(showDetails) {
     .then((data) => {
       console.log(data);
       //updatedShowDetails.title = data.name;
-
-      updatedShowDetails.network = data.networks[0].name;
-
-      updatedShowDetails.year = data.first_air_date.slice(0, 4);
-      updatedShowDetails.summary = data.overview;
-      updatedShowDetails.imgSrc =
-        "https://image.tmdb.org/t/p/w300" + data.poster_path;
+      if (data.networks && data.networks.length > 0) {
+        updatedShowDetails.network = data.networks[0].name;
+      }
+      if (data.first_air_date) {
+        updatedShowDetails.year = data.first_air_date.slice(0, 4);
+      }
+      if (data.overview) {
+        updatedShowDetails.summary = data.overview;
+      }
+      if (data.poster_path) {
+        updatedShowDetails.imgSrc =
+          "https://image.tmdb.org/t/p/w300" + data.poster_path;
+      } 
     });
   return updatedShowDetails;
 }
-function detailsFromTMDBmovie(showDetails) {
+function detailsFromTMDBmovie(showDetails) {//מידע מהרשת על הסרט
   var updatedShowDetails = showDetails;
   var tmdbID = showDetails.tmdbID;
   var tmdbURL =
@@ -281,17 +282,23 @@ function detailsFromTMDBmovie(showDetails) {
     .then((data) => {
       console.log(data);
       //updatedShowDetails.title = data.name;
-
-      updatedShowDetails.network = data.production_companies[0].name;
-
-      updatedShowDetails.year = data.release_date.slice(0, 4);
-      updatedShowDetails.summary = data.overview;
-      updatedShowDetails.imgSrc =
-        "https://image.tmdb.org/t/p/w300" + data.poster_path;
+      if (data.production_companies && data.production_companies.length > 0) {
+        updatedShowDetails.network = data.production_companies[0].name;
+      }
+      if (data.release_date) {
+        updatedShowDetails.year = data.release_date.slice(0, 4);
+      }
+      if (data.overview) {
+        updatedShowDetails.summary = data.overview;
+      }
+      if (data.poster_path) {
+        updatedShowDetails.imgSrc =
+          "https://image.tmdb.org/t/p/w300" + data.poster_path;
+      } 
     });
   return updatedShowDetails;
 }
-function viewShow(showDetails) {
+function viewShow(showDetails) {//התצוגה של הפופאפ
   var show = document.getElementById("show");
   removeAllChildNodes(show);
   if (showDetails.imgSrc !== "") {
@@ -300,9 +307,8 @@ function viewShow(showDetails) {
     poster.classList = "poster";
     show.append(poster);
   }
-  if (showDetails.star === "Yes") {
+  if (showDetails.star === "Yes") {//הכוכב הסגול
     var star = document.createElement("img");
-    //star.src = "https://i.imgur.com/cfvVpNu.png";
      star.src = "https://i.ibb.co/JkVhX2q/star.png";
     star.classList = "star";
     show.append(star);
@@ -340,12 +346,11 @@ function viewShow(showDetails) {
     if (findFranchiseShows(showDetails.franchise, showDetails).length > 0) {
       franchiseName.innerHTML += " with:";
       findFranchiseShows(showDetails.franchise, showDetails).map(
-        (showInFranchise) => {
+        (showInFranchise) => {//מעבר על כל שאר הסדרות מאותו פרנצ'ייז
           var otherShowName = document.createElement("li");
           otherShowName.innerHTML = showInFranchise;
           otherShowName.onclick = function () {
-            search1show(showInFranchise);
-            viewShow(findShowfromName(showInFranchise));
+            search1show(showInFranchise);//לחיצה על סדרה מהרשימה פותחת את החיפוש
           };
           franchise.append(otherShowName);
           return showInFranchise;
@@ -353,7 +358,7 @@ function viewShow(showDetails) {
       );
     }
   }
-  document.getElementById("myModal").style.display = "block";
+  document.getElementById("myModal").style.display = "block";//תצוגת הפופ אפ
 }
 
 function franchiseNamefromID(id) {
@@ -364,12 +369,12 @@ function franchiseNamefromID(id) {
   }
   return id;
 }
-function findFranchiseShows(franchise, showClicked) {
+function findFranchiseShows(franchise, showClicked) {//מקבל קוד פרנצ'ייז וסדרה ומחזיר את שאר הסדרות
   var showsInFranchise = [];
   for (var i in shows4real) {
     if (
       shows4real[i].franchise === franchise &&
-      showClicked.title !== shows4real[i].title
+      showClicked.title !== shows4real[i].title//מדלג על הסדרה עצמה
     ) {
       showsInFranchise.push(shows4real[i].title);
     }
@@ -382,7 +387,7 @@ var modal = document.getElementById("myModal");
 span.onclick = function () {
   modal.style.display = "none";
 };
-window.onclick = function (event) {
+window.onclick = function (event) {//לחיצה על הרקע סוגרת פופאפים
   if (event.target === modal || event.target === modal2) {
     modal.style.display = "none";
     modal2.style.display = "none";
@@ -394,7 +399,7 @@ span2.onclick = function () {
   modal2.style.display = "none";
 };
 
-function typeName2Num(typeName) {
+function typeName2Num(typeName) {//התאמת סוג למספר
   if (typeName === "ספינאוף") {
     return 1;
   }
@@ -415,7 +420,7 @@ function typeName2Num(typeName) {
   }
   return 7;
 }
-function type2color(typeNum) {
+function type2color(typeNum) {//התאמת מספר לצבע
   if (typeNum === 1) {
     return "yellow";
   }
