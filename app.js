@@ -25,7 +25,7 @@ function getData() {//נתונים מגוגל שיטס
           year: ele.year,
           franchise: ele.franchiseid,
           tmdbID: ele.tmdbid,
-          imgSrc: "https://i.pinimg.com/736x/a7/74/c4/a774c42e46b508961c708248aa37419a.jpg"
+          imgSrc: ele.imgsrc
         };
         if (newShow.tmdbID !== "") {//מידע מTMDB
             if (newShow.id.charAt(0) === "S"){
@@ -35,11 +35,16 @@ function getData() {//נתונים מגוגל שיטס
                 newShow = detailsFromTMDBmovie(newShow);
             }
         }
+        if(!newShow.imgSrc){
+          newShow.imgSrc="https://i.pinimg.com/736x/a7/74/c4/a774c42e46b508961c708248aa37419a.jpg";
+        }
+        console.log(newShow);
+
         shows4real.push(newShow);
-        if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {//מכניס שמות סדרות
+       // if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {//מכניס שמות סדרות
           onlyTheName.push(newShow.title);
           onlyTheName.sort();
-        }
+        //}
         var showNameAsOption = document.createElement("option");
         if (newShow.id.charAt(0) === "S"||newShow.id.charAt(0) === "M") {//מכניס לרשימת האפשרויות
           showNameAsOption.value = newShow.title;
@@ -68,7 +73,9 @@ function search1show(showName) {//חיפוש תוכנית לפי שם
   if (legitShowName(showName) && showName.length > 0) {
     document.getElementById("showName1").value=showName;//שם התוכנית בחיפוש
     viewShow(findShowfromName(showName));// קודם פותח את הפופאפ
-    viewCrossovers(createShowsCOList(showName));//ומאחורה יש את הקרוסאוברים
+    if(getShowIDfromName(showName).charAt(0) === "M"||getShowIDfromName(showName).charAt(0) === "S"){
+      viewCrossovers(createShowsCOList(showName));//ומאחורה יש את הקרוסאוברים
+    }
   }
 }
 function search2shows() {//חיפוש קרוס לפי שמות 2 סדרות
@@ -252,7 +259,7 @@ function detailsFromTMDBtv(showDetails) {//מידע מהרשת על הסדרה
   fetch(tmdbURL)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       //updatedShowDetails.title = data.name;
       if (data.networks && data.networks.length > 0) {
         updatedShowDetails.network = data.networks[0].name;
@@ -280,7 +287,7 @@ function detailsFromTMDBmovie(showDetails) {//מידע מהרשת על הסרט
   fetch(tmdbURL)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       //updatedShowDetails.title = data.name;
       if (data.production_companies && data.production_companies.length > 0) {
         updatedShowDetails.network = data.production_companies[0].name;
@@ -315,10 +322,6 @@ function viewShow(showDetails) {//התצוגה של הפופאפ
   }
   var title = document.createElement("h1");
   title.innerHTML = showDetails.title;
-  title.onclick = function () {
-    search1show(showDetails.title);
-    viewShow(findShowfromName(showDetails.title));
-  };
   show.append(title);
 
   var year = document.createElement("h2");
@@ -332,6 +335,37 @@ function viewShow(showDetails) {//התצוגה של הפופאפ
   summary.innerHTML = showDetails.summary;
   summary.classList = "summary";
   show.append(summary);
+  if(showDetails.id.charAt(0) === "B"||showDetails.id.charAt(0) === "C"){
+    var connected= document.createElement("div");
+    show.append(connected);
+    var connectionText = document.createElement("h2");
+    if(showDetails.id.charAt(0) === "B"){
+      connectionText.innerHTML ="Appearances of "+showDetails.title+":";
+    }
+    if(showDetails.id.charAt(0) === "C"){
+      connectionText.innerHTML ="Shows that participated in "+showDetails.title+":";
+    }
+    connected.append(connectionText);
+    var connectedShow = document.createElement("ul");
+    connected.append(connectedShow);
+    console.log(findConnectedShows(showDetails.title));
+    if (findConnectedShows(showDetails.title).length > 0) {
+      findConnectedShows(showDetails.title).map(
+        (showConnected) => {//מעבר על כל הסדרות הקשורות
+          var otherShowName = document.createElement("li");
+          otherShowName.innerHTML = showConnected.name;
+          if(showConnected.cross){
+            otherShowName.innerHTML+=": "+showConnected.cross;
+          }
+          otherShowName.style.color = showConnected.color;
+          otherShowName.onclick = function () {
+            search1show(showConnected.name);//לחיצה על סדרה מהרשימה פותחת את החיפוש
+          };
+          connected.append(otherShowName);
+        }
+      );
+    }
+  }
   if (showDetails.franchise !== "") {
     var franchise = document.createElement("div");
     show.append(franchise);
@@ -380,6 +414,21 @@ function findFranchiseShows(franchise, showClicked) {//מקבל קוד פרנצ'
     }
   }
   return showsInFranchise;
+}
+
+function findConnectedShows(showName) {//מקבל שם סדרה ומחזיר את שמות הסדרות הקשורות
+  var showsConnected = [];
+  var showId=getShowIDfromName(showName);
+  var showsCOs=createShowsCOList(showName);
+  for (var i in showsCOs) {
+    if (showsCOs[i].show1ID!==showId){
+      showsConnected.push({name:findShowfromID(showsCOs[i].show1ID).title,cross:showsCOs[i].cross,color:type2color(showsCOs[i].type)});
+    }
+    if (showsCOs[i].show2ID!==showId){
+      showsConnected.push({name:findShowfromID(showsCOs[i].show2ID).title,cross:showsCOs[i].cross,color:type2color(showsCOs[i].type)});
+    }
+  }
+  return showsConnected;
 }
 
 var span = document.getElementById("close");
